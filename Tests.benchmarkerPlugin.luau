@@ -2,7 +2,7 @@
 
 -- Tests for benchmarker plugin
 
-local threadPool = require(game:GetService("ReplicatedStorage").ThreadPool)
+local threadPool = require(game:GetService("ReplicatedStorage").ThreadPool).spawn
 
 -- STRAVANT'S IMPLEMENTATION
 	-- The currently idle thread to run the next handler on
