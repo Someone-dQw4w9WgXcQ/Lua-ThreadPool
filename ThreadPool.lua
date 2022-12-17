@@ -14,7 +14,7 @@ local function runner(thread)
 	while true do
 		-- Get function and parameters
 		-- Run the function
-		-- Passer function is necessary because otherwise luau would put toRun (nil at the start) in memory, then yield, then call nil
+		-- Passer function is necessary because otherwise lua would put toRun (nil at the start) in memory, then yield, then call nil
 		passer(coroutine_yield())
 
 		-- Done, make this thread available
