@@ -7,8 +7,7 @@ local coroutine_create = _coroutine.create
 local coroutine_yield = _coroutine.yield
 local _error = error
 
-local toRun
-local function passer(...)
+local function passer(toRun, ...)
 	toRun(...)
 end
 local function runner(thread)
@@ -40,14 +39,12 @@ return {
 			threads[threadIndex] = nil
 			threadIndex = threadIndex - 1
 
-			toRun = func
-			return coroutine_resume(thread, ...)
+			return coroutine_resume(thread, func, ...)
 		else
 			local thread = coroutine_create(runner)
 			coroutine_resume(thread, thread)
 
-			toRun = func
-			return coroutine_resume(thread, ...)
+			return coroutine_resume(thread, func, ...)
 		end
 	end,
 	["spawn"] = function(func, ...)
@@ -59,8 +56,7 @@ return {
 			threads[threadIndex] = nil
 			threadIndex = threadIndex - 1
 
-			toRun = func
-			local success, errorMessage = coroutine_resume(thread, ...)
+			local success, errorMessage = coroutine_resume(thread, func, ...)
 			if not success then
 				_error(errorMessage)
 			end
@@ -68,8 +64,7 @@ return {
 			local thread = coroutine_create(runner)
 			coroutine_resume(thread, thread)
 
-			toRun = func
-			local success, errorMessage = coroutine_resume(thread, ...)
+			local success, errorMessage = coroutine_resume(thread, func, ...)
 			if not success then
 				_error(errorMessage)
 			end
