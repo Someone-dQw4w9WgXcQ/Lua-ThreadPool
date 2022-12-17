@@ -44,7 +44,7 @@ local threadPool = require(game:GetService("ServerStorage").ThreadPool)
 	end
 
 
--- NON_YIELDING
+-- NON-YIELDING
 print("Testing spawning functions that don't yield")
 
 local function blank(params)
