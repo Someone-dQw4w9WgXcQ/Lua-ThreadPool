@@ -10,7 +10,6 @@ local function runner(thread: thread): never
 	while true do
 		-- Get function and parameters
 		-- Run the function
-		-- Passer function is necessary because otherwise luau would put toRun (nil at the start) in memory, then yield, then call nil
 		passer(coroutine.yield())
 
 		-- Done, make this thread available
