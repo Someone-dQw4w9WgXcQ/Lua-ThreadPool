@@ -27,7 +27,6 @@ for i = 1, threadIndex do
 end
 
 return function<_, params>(func: (params) -> (), ...: params): (boolean, string?)
-	--print(threads)
 	if threadIndex > 0 then
 		-- Thread available
 		local thread = threads[threadIndex]
