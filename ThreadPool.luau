@@ -26,7 +26,7 @@ for i = 1, threadIndex do
 	threads[i] = thread
 end
 
-return {
+return table.freeze({
 	["pcall"] = function<_, params>(func: (params) -> (), ...: params): (boolean, string?)
 		if threadIndex ~= 0 then
 			-- Thread available
@@ -65,4 +65,4 @@ return {
 			return task.spawn(thread, ...)
 		end
 	end
-}
+})
