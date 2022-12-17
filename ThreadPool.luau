@@ -1,6 +1,6 @@
 --!strict
 
-local threadIndex = 1e5
+local threadIndex = 100 -- How many threads to pre allocate
 local threads = table.create(threadIndex)
 
 local toRun
