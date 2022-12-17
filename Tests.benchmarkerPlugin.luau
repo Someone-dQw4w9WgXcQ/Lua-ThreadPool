@@ -45,6 +45,9 @@ local threadPool = require(game:GetService("ReplicatedStorage").ThreadPool)
 	end
 
 
+local function blankFunction(...) end
+local function yieldingFunction(...) task.wait() end
+
 return {
 	ParameterGenerator = function()
 		
@@ -52,36 +55,27 @@ return {
 
 	Functions = {
 		["task.spawn - Non-Yielding"] = function()
-			task.spawn(function()
-			end)
+			task.spawn(blankFunction)
 		end,
 
 		["ThreadPool - Non-Yielding"] = function()
-			threadPool(function()
-			end)
+			threadPool(blankFunction)
 		end,
 
 		["Stravant - Non-Yielding"] = function()
-			stravant(function()
-			end)
+			stravant(blankFunction)
 		end,
 		
 		["task.spawn - Yielding"] = function()
-			task.spawn(function()
-				task.wait()
-			end)
+			task.spawn(yieldingFunction)
 		end,
 		
 		["ThreadPool - Yielding"] = function()
-			threadPool(function()
-				task.wait()
-			end)
+			threadPool(yieldingFunction)
 		end,
 
 		["Stravant - Yielding"] = function()
-			stravant(function()
-				task.wait()
-			end)
+			stravant(yieldingFunction)
 		end
 	}
 }
