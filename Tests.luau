@@ -1,6 +1,6 @@
 --!strict
 
-local threadPool = require(game:GetService("ReplicatedStorage").ThreadPool)
+local threadPool = require(game:GetService("ReplicatedStorage").ThreadPool).spawn
 
 
 -- STRAVANT'S IMPLEMENTATION
