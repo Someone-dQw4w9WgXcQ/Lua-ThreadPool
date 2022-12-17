@@ -26,22 +26,43 @@ for i = 1, threadIndex do
 	threads[i] = thread
 end
 
-return function<_, params>(func: (params) -> (), ...: params): (boolean, string?)
-	if threadIndex > 0 then
-		-- Thread available
-		local thread = threads[threadIndex]
+return {
+	["pcall"] = function<_, params>(func: (params) -> (), ...: params): (boolean, string?)
+		if threadIndex ~= 0 then
+			-- Thread available
+			local thread = threads[threadIndex]
 
-		-- Remove as available
-		threads[threadIndex] = nil
-		threadIndex -= 1
+			-- Remove as available
+			threads[threadIndex] = nil
+			threadIndex -= 1
 
-		toRun = func
-		return coroutine.resume(thread, ...)
-	else
-		local thread = coroutine.create(runner)
-		coroutine.resume(thread, thread)
+			toRun = func
+			return coroutine.resume(thread, ...)
+		else
+			local thread = coroutine.create(runner)
+			coroutine.resume(thread, thread)
 
-		toRun = func
-		return coroutine.resume(thread, ...)
+			toRun = func
+			return coroutine.resume(thread, ...)
+		end
+	end,
+	["spawn"] = function<_, params>(func: (params) -> (), ...: params): (thread)
+		if threadIndex ~= 0 then
+			-- Thread available
+			local thread = threads[threadIndex]
+
+			-- Remove as available
+			threads[threadIndex] = nil
+			threadIndex -= 1
+
+			toRun = func
+			return task.spawn(thread, ...)
+		else
+			local thread = coroutine.create(runner)
+			coroutine.resume(thread, thread)
+
+			toRun = func
+			return task.spawn(thread, ...)
+		end
 	end
-end
+}
