@@ -25,39 +25,20 @@ for i = 1, threadIndex do
 	threads[i] = thread
 end
 
-return table.freeze({
-	["pcall"] = function<_, params>(func: (params) -> (), ...: params): (boolean, string?)
-		if threadIndex ~= 0 then
-			-- Thread available
-			local thread = threads[threadIndex]
+return function<_, params>(func: (params) -> (), ...: params): (thread)
+	if threadIndex ~= 0 then
+		-- Thread available
+		local thread = threads[threadIndex]
 
-			-- Remove as available
-			threads[threadIndex] = nil
-			threadIndex -= 1
+		-- Remove as available
+		threads[threadIndex] = nil
+		threadIndex -= 1
 
-			return coroutine.resume(thread, func, ...)
-		else
-			local thread = coroutine.create(runner)
-			coroutine.resume(thread, thread)
+		return task.spawn(thread, func, ...)
+	else
+		local thread = coroutine.create(runner)
+		coroutine.resume(thread, thread)
 
-			return coroutine.resume(thread, func, ...)
-		end
-	end,
-	["spawn"] = function<_, params>(func: (params) -> (), ...: params): (thread)
-		if threadIndex ~= 0 then
-			-- Thread available
-			local thread = threads[threadIndex]
-
-			-- Remove as available
-			threads[threadIndex] = nil
-			threadIndex -= 1
-
-			return task.spawn(thread, func, ...)
-		else
-			local thread = coroutine.create(runner)
-			coroutine.resume(thread, thread)
-
-			return task.spawn(thread, func, ...)
-		end
+		return task.spawn(thread, func, ...)
 	end
-})
+end
