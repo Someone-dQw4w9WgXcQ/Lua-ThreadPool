@@ -5,6 +5,7 @@ local _coroutine = coroutine
 local coroutine_resume = _coroutine.resume
 local coroutine_create = _coroutine.create
 local coroutine_yield = _coroutine.yield
+local _error = error
 
 local toRun
 local function passer(...)
@@ -29,22 +30,49 @@ for i = 1, threadIndex do
 	threads[i] = thread
 end
 
-return function(func, ...)
-	if threadIndex > 0 then
-		-- Thread available
-		local thread = threads[threadIndex]
+return {
+	["pcall"] = function(func, ...)
+		if threadIndex ~= 0 then
+			-- Thread available
+			local thread = threads[threadIndex]
 
-		-- Remove as available
-		threads[threadIndex] = nil
-		threadIndex = threadIndex - 1
+			-- Remove as available
+			threads[threadIndex] = nil
+			threadIndex = threadIndex - 1
 
-		toRun = func
-		return coroutine_resume(thread, ...)
-	else
-		local thread = coroutine_create(runner)
-		coroutine_resume(thread, thread)
+			toRun = func
+			return coroutine_resume(thread, ...)
+		else
+			local thread = coroutine_create(runner)
+			coroutine_resume(thread, thread)
 
-		toRun = func
-		return coroutine_resume(thread, ...)
+			toRun = func
+			return coroutine_resume(thread, ...)
+		end
+	end,
+	["spawn"] = function(func, ...)
+		if threadIndex ~= 0 then
+			-- Thread available
+			local thread = threads[threadIndex]
+
+			-- Remove as available
+			threads[threadIndex] = nil
+			threadIndex = threadIndex - 1
+
+			toRun = func
+			local success, errorMessage = coroutine_resume(thread, ...)
+			if not success then
+				_error(errorMessage)
+			end
+		else
+			local thread = coroutine_create(runner)
+			coroutine_resume(thread, thread)
+
+			toRun = func
+			local success, errorMessage = coroutine_resume(thread, ...)
+			if not success then
+				_error(errorMessage)
+			end
+		end
 	end
-end
+}
