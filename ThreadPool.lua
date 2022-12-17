@@ -29,45 +29,26 @@ for i = 1, threadIndex do
 	threads[i] = thread
 end
 
-return {
-	["pcall"] = function(func, ...)
-		if threadIndex ~= 0 then
-			-- Thread available
-			local thread = threads[threadIndex]
+return function(func, ...)
+	if threadIndex ~= 0 then
+		-- Thread available
+		local thread = threads[threadIndex]
 
-			-- Remove as available
-			threads[threadIndex] = nil
-			threadIndex = threadIndex - 1
+		-- Remove as available
+		threads[threadIndex] = nil
+		threadIndex = threadIndex - 1
 
-			return coroutine_resume(thread, func, ...)
-		else
-			local thread = coroutine_create(runner)
-			coroutine_resume(thread, thread)
-
-			return coroutine_resume(thread, func, ...)
+		local success, errorMessage = coroutine_resume(thread, func, ...)
+		if not success then
+			_error(errorMessage)
 		end
-	end,
-	["spawn"] = function(func, ...)
-		if threadIndex ~= 0 then
-			-- Thread available
-			local thread = threads[threadIndex]
+	else
+		local thread = coroutine_create(runner)
+		coroutine_resume(thread, thread)
 
-			-- Remove as available
-			threads[threadIndex] = nil
-			threadIndex = threadIndex - 1
-
-			local success, errorMessage = coroutine_resume(thread, func, ...)
-			if not success then
-				_error(errorMessage)
-			end
-		else
-			local thread = coroutine_create(runner)
-			coroutine_resume(thread, thread)
-
-			local success, errorMessage = coroutine_resume(thread, func, ...)
-			if not success then
-				_error(errorMessage)
-			end
+		local success, errorMessage = coroutine_resume(thread, func, ...)
+		if not success then
+			_error(errorMessage)
 		end
 	end
-}
+end
