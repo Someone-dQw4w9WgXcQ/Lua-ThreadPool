@@ -3,8 +3,7 @@
 local threadIndex = 100 -- How many threads to pre-allocate
 local threads = table.create(threadIndex)
 
-local toRun
-local function passer(...)
+local function passer(toRun, ...)
 	toRun(...)
 end
 local function runner(thread: thread): never
@@ -36,14 +35,12 @@ return table.freeze({
 			threads[threadIndex] = nil
 			threadIndex -= 1
 
-			toRun = func
-			return coroutine.resume(thread, ...)
+			return coroutine.resume(thread, func, ...)
 		else
 			local thread = coroutine.create(runner)
 			coroutine.resume(thread, thread)
 
-			toRun = func
-			return coroutine.resume(thread, ...)
+			return coroutine.resume(thread, func, ...)
 		end
 	end,
 	["spawn"] = function<_, params>(func: (params) -> (), ...: params): (thread)
@@ -55,14 +52,12 @@ return table.freeze({
 			threads[threadIndex] = nil
 			threadIndex -= 1
 
-			toRun = func
-			return task.spawn(thread, ...)
+			return task.spawn(thread, func, ...)
 		else
 			local thread = coroutine.create(runner)
 			coroutine.resume(thread, thread)
 
-			toRun = func
-			return task.spawn(thread, ...)
+			return task.spawn(thread, func, ...)
 		end
 	end
 })
