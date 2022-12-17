@@ -1,4 +1,4 @@
-local threadIndex = 100 -- How many threads to pre allocate
+local threadIndex = 100 -- How many threads to pre-allocate
 local threads = {}
 
 local _coroutine = coroutine
